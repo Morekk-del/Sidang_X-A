@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Berkas Panitia — Simulasi Sidang PPKN "Kekuasaan di Atas Hukum"</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<style>
+:root{
+  --paper:#F0ECE1;
+  --paper-raised:#F8F5EC;
+  --ink:#20262E;
+  --ink-soft:#565F6B;
+  --line:#D8D0BC;
+  --line-strong:#B9AE8E;
+  --navy:#1E2A38;
+  --navy-soft:#2E3E52;
+  --burgundy:#7A2E2E;
+  --burgundy-soft:#B4573F;
+  --brass:#8C6B2E;
+  --sage:#4C6A57;
+  --slate-bg:#171D24;
+  --radius:3px;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height:1.55;
+}
+h1,h2,h3,h4{
+  font-family:'Fraunces', Georgia, serif;
+  font-weight:600;
+  color:var(--navy);
+  margin:0 0 .4em;
+  letter-spacing:.002em;
+}
+p{margin:0 0 .9em;}
+a{color:var(--burgundy-soft);}
+.mono{font-family:'IBM Plex Mono', monospace;}
+
+/* ===== Top bar ===== */
+.topbar{
+  background:var(--navy);
+  color:#EFE9DA;
+  padding:0 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:64px;
+  position:sticky; top:0; z-index:40;
+  border-bottom:3px solid var(--brass);
+}
+.topbar .brand{
+  display:flex; align-items:baseline; gap:12px;
+}
+.topbar .brand .seal{
+  font-family:'Fraunces', serif;
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:.01em;
+}
+.topbar .brand .subtitle{
+  font-size:12.5px;
+  color:#B9C2CE;
+  font-style:italic;
+}
+.topbar .stamp{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  border:1px solid var(--burgundy-soft);
+  color:#E7B9A9;
+  padding:4px 10px;
+  border-radius:2px;
+  letter-spacing:.08em;
+}
+
+/* ===== Nav tabs ===== */
+.navtabs{
+  background:var(--navy-soft);
+  display:flex;
+  gap:2px;
+  padding:0 24px;
+  overflow-x:auto;
+  position:sticky; top:64px; z-index:39;
+}
+.navtabs button{
+  background:transparent;
+  border:none;
+  color:#C6CEDA;
+  font-family:'Source Sans 3', sans-serif;
+  font-size:14.5px;
+  padding:13px 16px;
+  cursor:pointer;
+  border-bottom:3px solid transparent;
+  white-space:nowrap;
+}
+.navtabs button:hover{color:#fff;}
+.navtabs button.active{
+  color:#fff;
+  border-bottom-color:var(--brass);
+  background:rgba(255,255,255,.04);
+}
+
+/* ===== Layout ===== */
+.wrap{max-width:1040px; margin:0 auto; padding:36px 24px 80px;}
+.view{display:none;}
+.view.active{display:block; animation:fadein .25s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+.case-header{
+  border-bottom:2px solid var(--line-strong);
+  padding-bottom:18px;
+  margin-bottom:28px;
+}
+.case-header .kicker{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  color:var(--burgundy);
+  letter-spacing:.06em;
+  margin-bottom:6px;
+}
+.case-header h1{font-size:30px;}
+.case-header .desc{color:var(--ink-soft); max-width:640px; font-size:15px;}
+
+/* ===== Cards ===== */
+.card{
+  background:var(--paper-raised);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:20px 22px;
+  margin-bottom:16px;
+}
+.card h2{font-size:19px; margin-bottom:10px;}
+.card h3{font-size:16px; margin:14px 0 6px;}
+
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media (max-width:720px){.two-col{grid-template-columns:1fr;}}
+
+/* ===== Group headers (kelompok) ===== */
+.group-block{margin-bottom:30px;}
+.group-title{
+  display:flex; align-items:center; gap:10px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12.5px;
+  color:var(--brass);
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+  padding-bottom:6px;
+  border-bottom:1px solid var(--line);
+}
+
+.char-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+  gap:12px;
+}
+.char-card{
+  background:var(--paper-raised);
+  border:1px solid var(--line);
+  border-left:4px solid var(--navy-soft);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  cursor:pointer;
+  transition:border-color .15s, box-shadow .15s;
+}
+.char-card:hover{border-left-color:var(--burgundy-soft); box-shadow:0 2px 8px rgba(30,42,56,.08);}
+.char-card .cn{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft);}
+.char-card h4{font-size:16.5px; margin:2px 0 4px;}
+.char-card .role{font-size:12.5px; color:var(--burgundy); font-style:italic;}
+
+/* ===== Modal ===== */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(20,24,30,.55);
+  display:none; align-items:flex-start; justify-content:center;
+  padding:40px 20px; overflow-y:auto; z-index:60;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--paper-raised);
+  max-width:640px; width:100%;
+  border-radius:var(--radius);
+  border-top:5px solid var(--burgundy);
+  padding:28px 30px 30px;
+  position:relative;
+}
+.modal .close-btn{
+  position:absolute; top:14px; right:16px;
+  background:none; border:none; font-size:22px; cursor:pointer; color:var(--ink-soft);
+  line-height:1;
+}
+.modal .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+.badge{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  padding:3px 9px;
+  border-radius:2px;
+  border:1px solid var(--line-strong);
+  color:var(--ink-soft);
+}
+.badge.secret{background:var(--burgundy); color:#F5E5DE; border-color:var(--burgundy);}
+.modal-body blockquote{
+  margin:10px 0; padding:8px 14px;
+  border-left:3px solid var(--burgundy-soft);
+  background:#F3E4DD; color:var(--burgundy);
+  font-size:13.5px;
+}
+.modal-body h1{font-size:20px;}
+.modal-body h2{font-size:16px; margin-top:16px;}
+.modal-body ul{padding-left:20px;}
+.modal-body li{margin-bottom:4px; font-size:14.5px;}
+.modal-body em{color:var(--ink-soft);}
+
+/* ===== Scenario tabs ===== */
+.scenario-tabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px;}
+.scenario-tabs button{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12.5px;
+  background:var(--paper-raised);
+  border:1px solid var(--line-strong);
+  padding:7px 12px;
+  border-radius:2px;
+  cursor:pointer;
+  color:var(--ink);
+}
+.scenario-tabs button.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+
+.outcome-tag{
+  display:inline-block;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  padding:3px 10px;
+  border-radius:2px;
+  background:var(--sage);
+  color:#EAF0EB;
+  margin-bottom:12px;
+}
+
+table{border-collapse:collapse; width:100%; font-size:13.5px; margin:8px 0 16px;}
+table th, table td{border:1px solid var(--line-strong); padding:8px 10px; text-align:left; vertical-align:top;}
+table th{background:var(--navy); color:#EFE9DA; font-weight:600; font-size:12.5px;}
+table tr:nth-child(even) td{background:#EAE4D3;}
+
+.doc-section h3{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:13px;
+  color:var(--brass);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-top:22px;
+}
+.doc-section .lock-note{
+  display:inline-block;
+  background:var(--burgundy); color:#F5E5DE;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11.5px;
+  padding:3px 9px;
+  border-radius:2px;
+  margin:6px 0 10px;
+}
+
+.search-box{
+  width:100%; max-width:340px;
+  padding:9px 12px;
+  border:1px solid var(--line-strong);
+  border-radius:2px;
+  font-size:14px;
+  background:var(--paper-raised);
+  margin-bottom:20px;
+  font-family:'Source Sans 3', sans-serif;
+}
+
+.footer-note{
+  text-align:center; color:var(--ink-soft); font-size:12px; padding:30px 0 10px;
+  font-family:'IBM Plex Mono', monospace;
+}
+
+@media (max-width:600px){
+  .topbar{padding:0 14px;}
+  .wrap{padding:24px 14px 60px;}
+  .case-header h1{font-size:24px;}
+}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="seal">Berkas Panitia</div>
+    <div class="subtitle">Simulasi Sidang PPKN — "Kekuasaan di Atas Hukum"</div>
+  </div>
+  <div class="stamp">KHUSUS PANITIA / MODERATOR</div>
+</div>
+
+<div class="navtabs">
+  <button data-view="ringkasan" class="active">Ringkasan Kasus</button>
+  <button data-view="karakter">Peran &amp; Karakter</button>
+  <button data-view="probabilitas">Probabilitas Sidang</button>
+  <button data-view="panduan">Panduan Moderator</button>
+</div>
+
+<div class="wrap">
+
+  <!-- RINGKASAN -->
+  <div id="view-ringkasan" class="view active">
+    <div class="case-header">
+      <div class="kicker">BERKAS NO. 001 — LAPORAN KASUS</div>
+      <h1>Pembunuhan Mahasiswa di Universitas X</h1>
+      <div class="desc">Dokumen kerja internal panitia untuk mempersiapkan dan memoderatori tiga babak simulasi sidang. Berisi kronologi dasar, 29 lembar peran, sembilan varian probabilitas jalannya sidang, serta panduan clue dan naskah pertemuan rahasia.</div>
+    </div>
+
+    <div class="card">
+      <h2>Kronologi Kasus</h2>
+      <div id="kondisiAwalBody"></div>
+    </div>
+
+    <div class="card">
+      <h2>Harapan Hasil Akhir</h2>
+      <div id="harapanBody"></div>
+    </div>
+  </div>
+
+  <!-- KARAKTER -->
+  <div id="view-karakter" class="view">
+    <div class="case-header">
+      <div class="kicker">LEMBAR KARAKTER RAHASIA</div>
+      <h1>Peran &amp; Karakter</h1>
+      <div class="desc">29 lembar peran, dikelompokkan sesuai posisi di ruang sidang. Klik kartu untuk membuka detail lengkap satu karakter.</div>
+    </div>
+    <input type="text" class="search-box" id="karakterSearch" placeholder="Cari nama, peran, atau kata kunci…">
+    <div id="karakterGroups"></div>
+  </div>
+
+  <!-- PROBABILITAS -->
+  <div id="view-probabilitas" class="view">
+    <div class="case-header">
+      <div class="kicker">SIMULASI PERCABANGAN</div>
+      <h1>Probabilitas Sidang</h1>
+      <div class="desc">Sembilan kemungkinan jalannya sidang tergantung siapa yang "menolak" tekanan dan kapan retakan itu muncul. Gunakan sebagai panduan improvisasi saat memoderatori, bukan skrip yang mengikat.</div>
+    </div>
+
+    <div class="card">
+      <h2>Tabel Ringkasan Perbandingan</h2>
+      <div id="tabelRingkasan"></div>
+    </div>
+
+    <div class="scenario-tabs" id="scenarioTabs"></div>
+    <div class="card">
+      <span class="outcome-tag" id="scenarioOutcome"></span>
+      <div id="scenarioBody"></div>
+      <div id="scenarioGimik" class="doc-section"></div>
+    </div>
+  </div>
+
+  <!-- PANDUAN -->
+  <div id="view-panduan" class="view">
+    <div class="case-header">
+      <div class="kicker">DOKUMEN OPERASIONAL</div>
+      <h1>Panduan Moderator</h1>
+      <div class="desc">Rundown waktu, paket clue per jeda, dan naskah pertemuan rahasia antar peran. Bagian ini tidak dibagikan ke pemeran — hanya untuk moderator/panitia.</div>
+    </div>
+
+    <div class="card doc-section">
+      <h2>Rundown Simulasi Sidang</h2>
+      <div id="docRundown"></div>
+    </div>
+
+    <div class="card doc-section">
+      <h2>Panduan Moderator &amp; Paket Clue</h2>
+      <div id="docClue"></div>
+    </div>
+
+    <div class="card doc-section">
+      <h2>Naskah Pertemuan Rahasia</h2>
+      <div id="docNaskah"></div>
+    </div>
+  </div>
+
+  <div class="footer-note">DOKUMEN INTERNAL — DISUSUN UNTUK KEPERLUAN SIMULASI PPKN</div>
+</div>
+
+<!-- Character detail modal -->
+<div class="modal-overlay" id="charModalOverlay">
+  <div class="modal">
+    <button class="close-btn" id="charModalClose">&times;</button>
+    <div class="badge-row" id="modalBadges"></div>
+    <h2 id="modalTitle"></h2>
+    <p style="color:var(--burgundy); font-style:italic; margin-top:-6px;" id="modalRole"></p>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const CHARACTERS = [{"num": "01", "name": "Alvino", "peran": "Jaksa Penuntut Umum 1", "kelompok": "Kelompok 1 — Penuntut Umum", "body": "# 1. Alvino — Jaksa Penuntut Umum 1\n\n*Kelompok 1 — Penuntut Umum*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n38 th, jaksa senior, dikenal tegas dan berbasis bukti, naik jabatan murni dari kerja keras tanpa koneksi.\n\n## Kepribadian\nSkeptis, teliti, tidak suka jalan pintas, sedikit kaku dalam retorika.\n\n## Yang Dia Ketahui\nKronologi kasus resmi, hasil otopsi awal, rekam jejak konflik Steve–korban soal tuduhan kecurangan lomba.\n\n## Yang TIDAK Dia Ketahui\nApapun soal pendekatan pribadi ke Phillip, Yohana, atau saksi-saksi. Ia murni bekerja dari berkas.\n\n## Beban Internal / Dorongan Tersembunyi\nIngin kasus ini jadi pembuktian bahwa kekayaan tidak bisa membeli keadilan — bisa membuatnya agresif menekan Terdakwa di persidangan, kadang sampai terlihat 'sudah punya kesimpulan' sebelum waktunya.\n\n## Tujuan di Sidang\nMembuktikan dakwaan dengan bukti kuat, dan diam-diam mengamati rekan jaksanya (Phillip) apakah bersikap wajar.\n\n## Hubungan Antar Karakter\n- [[02 - Phillip]] — Rekan sesama Jaksa Penuntut Umum; Alvino diam-diam mengamati apakah Phillip bersikap wajar.\n- [[07 - Steve]] — Terdakwa yang ia tuntut berdasarkan bukti dan kronologi resmi.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "02", "name": "Phillip", "peran": "Jaksa Penuntut Umum 2", "kelompok": "Kelompok 1 — Penuntut Umum", "body": "# 2. Phillip — Jaksa Penuntut Umum 2\n\n*Kelompok 1 — Penuntut Umum*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n41 th, mengajar paruh waktu di yayasan pendidikan yang kekurangan dana untuk gedung baru.\n\n## Kepribadian\nProfesional di depan umum, tapi realistis soal kebutuhan finansial pribadi dan institusinya.\n\n## Yang Dia Ketahui\nBerkas kasus; ia juga pernah 'kebetulan' bertemu Jesslyn (ibu Steve) di sebuah acara makan malam, yang menyinggung soal donasi untuk yayasannya.\n\n## Yang TIDAK Dia Ketahui\nBahwa Jesslyn juga mendekati pihak lain (Yohana, saksi-saksi) — dia hanya tahu bagian yang menyentuh dirinya sendiri.\n\n## Beban Internal / Dorongan Tersembunyi\nPertemuan itu terasa 'tidak sengaja' tapi tawarannya menggantung. Bebas memutuskan: menerima, menolaknya secara diam-diam, atau melaporkannya — semua pilihan valid secara karakter.\n\n## Tujuan di Sidang\nBekerja 'sesuai bukti' secara terbuka, sambil menyimpan keputusan pribadinya soal tawaran itu.\n\n## Hubungan Antar Karakter\n- [[11 - Jesslyn]] — Pernah 'kebetulan' bertemu Jesslyn di acara makan malam; Jesslyn menyinggung donasi untuk yayasannya sebagai bentuk pendekatan.\n- [[01 - Alvino]] — Rekan sesama Jaksa Penuntut Umum.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "03", "name": "Karin", "peran": "Hakim Ketua", "kelompok": "Kelompok 2 — Hakim & Kepaniteraan", "body": "# 3. Karin — Hakim Ketua\n\n*Kelompok 2 — Hakim & Kepaniteraan*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n52 th, hakim berpengalaman, dikenal netral dan berwibawa, pernah menangani kasus-kasus bernuansa politis.\n\n## Kepribadian\nTenang, tajam bertanya, tidak mudah terkesan oleh status sosial pihak yang bersidang.\n\n## Yang Dia Ketahui\nHanya apa yang muncul di persidangan — tidak tahu apa pun soal upaya-upaya di luar sidang.\n\n## Beban Internal / Dorongan Tersembunyi\nMenjaga agar sidang tidak terlihat 'diatur' — kalau mencium kejanggalan (saksi yang tampak tertekan, jaksa yang tampak ragu), wajar baginya untuk mengejar itu dengan pertanyaan tajam.\n\n## Tujuan di Sidang\nMemimpin sidang secara adil, memutuskan berdasarkan fakta yang benar-benar terungkap di ruang sidang.\n\n## Hubungan Antar Karakter\n- [[04 - Elhard]] — Sesama hakim dalam majelis; menjadi penyeimbang bila diperlukan.\n- [[05 - Kevin]] — Sesama hakim dalam majelis.\n- [[06 - Nadine]] — Panitera yang mencatat jalannya sidang yang ia pimpin.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "04", "name": "Elhard", "peran": "Hakim Anggota 1", "kelompok": "Kelompok 2 — Hakim & Kepaniteraan", "body": "# 4. Elhard — Hakim Anggota 1\n\n*Kelompok 2 — Hakim & Kepaniteraan*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n47 th, mantan akademisi hukum, cenderung berpegang teguh pada prosedur.\n\n## Kepribadian\nDetail, suka mengutip pasal, agak formal.\n\n## Yang Dia Ketahui\nSama seperti Karin — hanya fakta persidangan.\n\n## Tujuan di Sidang\nMemastikan proses berjalan sesuai hukum acara, sering menjadi penyeimbang bila ada pertanyaan yang terlalu menekan.\n\n## Hubungan Antar Karakter\n- [[03 - Karin]] — Hakim Ketua dalam majelis yang sama.\n- [[05 - Kevin]] — Sesama hakim anggota dalam majelis.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "05", "name": "Kevin", "peran": "Hakim Anggota 2", "kelompok": "Kelompok 2 — Hakim & Kepaniteraan", "body": "# 5. Kevin — Hakim Anggota 2\n\n*Kelompok 2 — Hakim & Kepaniteraan*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n44 th, lebih muda dari dua hakim lain, dikenal lebih peka terhadap dinamika psikologis saksi.\n\n## Kepribadian\nPengamat yang baik, sering menangkap bahasa tubuh atau keraguan dalam kesaksian.\n\n## Beban Internal / Dorongan Tersembunyi\nCenderung curiga bila ada saksi yang tiba-tiba mengubah keterangan tanpa alasan jelas — ini bisa jadi celah dramatis bila salah satu saksi (mis. Becky/Kaylee) goyah di kursi saksi.\n\n## Tujuan di Sidang\nMenggali motif di balik perubahan sikap saksi, bila itu terjadi.\n\n## Hubungan Antar Karakter\n- [[03 - Karin]] — Hakim Ketua dalam majelis yang sama.\n- [[04 - Elhard]] — Sesama hakim anggota dalam majelis.\n- [[17 - Becky]] — Salah satu saksi yang gerak-geriknya ia curigai bila berubah keterangan.\n- [[13 - Kaylee]] — Salah satu saksi yang gerak-geriknya ia curigai bila berubah keterangan.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "06", "name": "Nadine", "peran": "Panitera / Panitera Pengganti", "kelompok": "Kelompok 2 — Hakim & Kepaniteraan", "body": "# 6. Nadine — Panitera / Panitera Pengganti\n\n*Kelompok 2 — Hakim & Kepaniteraan*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n29 th, teliti, bertanggung jawab mencatat jalannya sidang.\n\n## Kepribadian\nNetral, administratif, jarang bicara kecuali diperlukan.\n\n## Tujuan di Sidang\nMencatat semua secara akurat — perannya lebih fungsional, tapi bisa jadi 'saksi diam' atas hal-hal janggal yang terjadi di ruang sidang.\n\n## Hubungan Antar Karakter\n- [[03 - Karin]] — Mencatat jalannya sidang yang dipimpin Karin selaku Hakim Ketua.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "07", "name": "Steve", "peran": "Terdakwa (Mahasiswa A)", "kelompok": "Kelompok 3 — Terdakwa & Penasihat Hukum", "body": "# 7. Steve — Terdakwa (Mahasiswa A)\n\n*Kelompok 3 — Terdakwa & Penasihat Hukum*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n21 th, Manajemen Bisnis semester 6, anak tunggal keluarga kaya, ketua organisasi mahasiswa bergengsi.\n\n## Kepribadian\nTerbiasa segalanya 'diselesaikan' oleh keluarganya, panik saat tertekan, punya rasa bersalah yang ia coba tekan.\n\n## Yang Dia Ketahui\nMalam kejadian dari sudut pandangnya sendiri (bebas ditafsirkan — bisa jujur ke diri sendiri atau menyangkal). Ia tahu ibunya 'mengatur sesuatu' tapi tidak tahu detail penuh siapa saja yang didekati.\n\n## Beban Internal / Dorongan Tersembunyi\nKonflik antara rasa bersalah dan naluri bertahan hidup yang ditanamkan keluarganya. Bisa memilih diam mengikuti arahan ibunya, atau retak dan mulai jujur di tengah sidang — ini keputusan saat itu, bukan skrip.\n\n## Tujuan di Sidang\nBertahan dari dakwaan, sambil menahan tekanan psikologis dari dalam dirinya sendiri.\n\n## Hubungan Antar Karakter\n- [[11 - Jesslyn]] — Ibunya; tahu ibunya 'mengatur sesuatu' di balik layar meski tidak tahu detailnya.\n- [[08 - Alice]] — Salah satu penasihat hukum yang membelanya.\n- [[09 - Nikey]] — Salah satu penasihat hukum yang membelanya.\n- [[17 - Becky]] — Sahabat dekat dalam circle-nya, mengetahui alibi aslinya.\n- [[18 - Ken2]] — Bagian dari lingkaran pertemanannya.\n- [[19 - Stefano]] — Bagian dari lingkaran pertemanannya.\n- [[01 - Alvino]] — Jaksa Penuntut Umum yang menuntutnya.\n- [[15 - Otniel]] — Sahabat korban yang menaruh amarah terpendam terhadap circle-nya.\n- [[16 - Elvin]] — Staf fakultas yang menangani laporan kecurangan tim Steve.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "08", "name": "Alice", "peran": "Penasihat Hukum Terdakwa 1", "kelompok": "Kelompok 3 — Terdakwa & Penasihat Hukum", "body": "# 8. Alice — Penasihat Hukum Terdakwa 1\n\n*Kelompok 3 — Terdakwa & Penasihat Hukum*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n34 th, pengacara muda idealis, baru beberapa tahun menangani kasus besar.\n\n## Kepribadian\nProfesional, gugup ketika diminta hal di luar batas etika, tapi ambisius dan butuh nama besar Jesslyn sebagai klien.\n\n## Yang Dia Ketahui\nAda indikasi kliennya (Jesslyn) menginginkan 'jalur lain' selain hukum formal, tapi Alice tidak dilibatkan langsung dalam eksekusinya.\n\n## Beban Internal / Dorongan Tersembunyi\nKonflik etika — profesinya vs firasat bahwa ada yang tidak beres. Bisa memilih menutup mata, mencari tahu lebih jauh, atau mengambil jarak.\n\n## Tujuan di Sidang\nMembela Steve dengan strategi hukum yang sah, sambil bergulat dengan kegelisahan moralnya sendiri.\n\n## Hubungan Antar Karakter\n- [[11 - Jesslyn]] — Kliennya; Alice curiga Jesslyn menginginkan 'jalur lain' di luar hukum formal.\n- [[07 - Steve]] — Terdakwa yang ia bela.\n- [[09 - Nikey]] — Rekan sesama penasihat hukum terdakwa.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "09", "name": "Nikey", "peran": "Penasihat Hukum Terdakwa 2", "kelompok": "Kelompok 3 — Terdakwa & Penasihat Hukum", "body": "# 9. Nikey — Penasihat Hukum Terdakwa 2\n\n*Kelompok 3 — Terdakwa & Penasihat Hukum*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n39 th, lebih senior dan pragmatis dibanding Alice, sudah biasa menangani klien-klien berpengaruh.\n\n## Kepribadian\nRealistis, tidak naif, memahami 'cara dunia bekerja' tapi tetap menghitung risiko.\n\n## Yang Dia Ketahui\nLebih banyak dari Alice — sadar ada pihak yang 'diminta bantuan' di luar sidang (tanpa tahu rinci setiap kasus), dan sudah mengingatkan Jesslyn soal risikonya.\n\n## Beban Internal / Dorongan Tersembunyi\nMenjaga jarak profesional yang cukup supaya 'bersih' secara hukum, sambil tetap melayani kliennya.\n\n## Tujuan di Sidang\nStrategi pembelaan yang rapi dan defensif, tanpa pernah secara eksplisit terlibat hal-hal di luar hukum.\n\n## Hubungan Antar Karakter\n- [[11 - Jesslyn]] — Kliennya; Nikey sadar ada pihak yang 'diminta bantuan' di luar sidang dan sudah mengingatkannya soal risiko.\n- [[07 - Steve]] — Terdakwa yang ia bela.\n- [[08 - Alice]] — Rekan sesama penasihat hukum terdakwa.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "10", "name": "Jayden", "peran": "Orang Tua/Keluarga Korban", "kelompok": "Kelompok 4 — Keluarga", "body": "# 10. Jayden — Orang Tua/Keluarga Korban\n\n*Kelompok 4 — Keluarga*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n50 th, dari desa di Jawa Tengah, satu-satunya orang tua yang mampu hadir karena keterbatasan biaya, sangat bangga pada prestasi anaknya.\n\n## Kepribadian\nSederhana, terluka, tapi punya keteguhan moral yang kuat — tidak mudah diintimidasi meski merasa 'kalah' secara status sosial di ruang sidang.\n\n## Yang Dia Ketahui\nHanya cerita dari sudut pandangnya sebagai orang tua korban — prestasi anaknya, laporan kecurangan yang dibuatnya sebelum meninggal.\n\n## Tujuan di Sidang\nMencari keadilan murni bagi anaknya, curiga (tapi tanpa bukti) bahwa ada kekuatan besar yang bermain melawannya.\n\n## Hubungan Antar Karakter\n- [[11 - Jesslyn]] — Curiga (tanpa bukti) bahwa keluarga terdakwa memakai kekuatan besar melawannya.\n- [[15 - Otniel]] — Sahabat dekat mendiang anaknya (korban).\n- [[16 - Elvin]] — Staf fakultas yang menangani laporan kecurangan yang dibuat anaknya sebelum meninggal.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "11", "name": "Jesslyn", "peran": "Orang Tua/Keluarga Terdakwa", "kelompok": "Kelompok 4 — Keluarga", "body": "# 11. Jesslyn — Orang Tua/Keluarga Terdakwa\n\n*Kelompok 4 — Keluarga*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n46 th, pejabat yang membangun karier dari nol, sangat protektif terhadap anak semata wayangnya.\n\n## Kepribadian\nDingin di bawah tekanan, kalkulatif, mengubah amarah jadi strategi. Terbiasa 'menyelesaikan masalah' dengan pengaruh dan uang.\n\n## Yang Dia Ketahui\nIa yang mengorkestrasi pendekatan ke pengacara, ahli forensik digital, saksi, jaksa, dan media.\n\n## Beban Internal / Dorongan Tersembunyi\nCATATAN KHUSUS: ini satu-satunya karakter yang memang dirancang tahu peta besar, karena dialah penggeraknya. Tapi bagaimana ia mengeksekusinya di tiap adegan tetap keputusan saat itu — bukan dialog yang wajib diikuti kata per kata.\n\n## Tujuan di Sidang\nMenjaga citra keluarga tetap terlihat kooperatif dan sah di hadapan hukum, sambil bekerja di balik layar.\n\n## Hubungan Antar Karakter\n- [[07 - Steve]] — Anak semata wayangnya, terdakwa dalam kasus ini.\n- [[08 - Alice]] — Pengacara yang ia dekati/perintahkan untuk membela Steve.\n- [[09 - Nikey]] — Pengacara yang ia dekati; sudah mengingatkannya soal risiko.\n- [[02 - Phillip]] — Jaksa yang ia dekati lewat pertemuan 'tidak sengaja' membahas donasi yayasan.\n- [[21 - Yohana]] — Ahli forensik digital yang ia coba dekati lewat tawaran amplop.\n- [[17 - Becky]] — Saksi (sahabat Steve) yang ia singgung soal bantuan biaya kuliah agar 'mengingat-ingat lagi' malam kejadian.\n- [[28 - Jessica]] — Wartawan yang didekati lewat pihak humas keluarga untuk 'dukungan liputan independen'.\n- [[13 - Kaylee]] — Salah satu saksi yang didekati orang-orang di parkiran kampus terkait pengaruh keluarga Steve.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "12", "name": "Natalee", "peran": "Saksi Mata 1 (melihat konfrontasi di Aula)", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 12. Kaylee — Saksi Mata 1 (melihat konfrontasi di Aula)\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n20 th, mahasiswi biasa, tidak terlibat langsung dengan kedua kubu.\n\n## Kepribadian\nJujur secara alami, tapi mudah cemas dan menghindari konflik.\n\n## Yang Dia Ketahui\nMelihat konfrontasi verbal antara Steve dan korban di Aula sebelum kejadian.\n\n## Beban Internal / Dorongan Tersembunyi\nPernah didekati dua orang di parkiran kampus yang menyinggung 'keluarga Steve berpengaruh di mana-mana' — tanpa ancaman eksplisit. Bisa membuatnya ragu-ragu di kursi saksi, tapi keputusan akhirnya (tetap jujur / melunak) ada di tangan pemain saat itu.\n\n## Tujuan di Sidang\nMenyampaikan apa yang ia lihat — sambil menahan rasa takut yang tidak sepenuhnya bisa ia jelaskan.\n\n## Hubungan Antar Karakter\n- [[12 - Natalee]] — Teman satu angkatan, sama-sama menyaksikan konfrontasi di Aula.\n- [[07 - Steve]] — Saksi konfrontasi verbal antara Steve dan korban.\n- [[11 - Jesslyn]] — Diduga pihak di balik dua orang yang mendekatinya di parkiran kampus.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "13", "name": "Kaylee", "peran": "Saksi Mata 2 (melihat konfrontasi di Aula)", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 13. Natalee — Saksi Mata 2 (melihat konfrontasi di Aula)\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n21 th, teman satu angkatan Kaylee, hadir di lokasi yang sama.\n\n## Kepribadian\nLebih berani dan blak-blakan dibanding Kaylee, kurang terpengaruh gosip sosial.\n\n## Yang Dia Ketahui\nVersi kejadian yang sama dari sudut pandang berbeda — bisa menguatkan atau sedikit berbeda detail dengan kesaksian Kaylee (variasi memori manusia yang wajar).\n\n## Tujuan di Sidang\nBersaksi apa adanya, relatif tidak tertekan oleh pihak manapun.\n\n## Hubungan Antar Karakter\n- [[13 - Kaylee]] — Teman satu angkatan, sama-sama menyaksikan konfrontasi di Aula.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "14", "name": "Freya", "peran": "Saksi yang Menemukan Jenazah", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 14. Freya — Saksi yang Menemukan Jenazah\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n22 th, mahasiswi yang kebetulan lewat parkiran kampus malam itu.\n\n## Kepribadian\nMasih trauma ringan dengan kejadian tersebut, cenderung bicara pelan dan hati-hati saat mengingat detail.\n\n## Yang Dia Ketahui\nKondisi TKP saat ia menemukan jenazah, waktu perkiraan, siapa saja yang ia lihat/panggil pertama kali.\n\n## Tujuan di Sidang\nMemberi keterangan teknis soal penemuan, tanpa opini soal siapa pelakunya.\n\n## Hubungan Antar Karakter\n- [[22 - Callysta]] — Petugas kepolisian pertama yang menangani TKP setelah ia menemukan jenazah.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "15", "name": "Otniel", "peran": "Saksi Teman Dekat Korban", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 15. Otniel — Saksi Teman Dekat Korban\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n20 th, satu-satunya sahabat dekat korban di kampus (korban dikenal pendiam & jarang bersosialisasi).\n\n## Kepribadian\nSetia, sedih, dan menyimpan amarah terpendam terhadap tim Steve karena laporan kecurangan yang jadi motif dugaan.\n\n## Yang Dia Ketahui\nCerita dari sisi korban — proses pelaporan kecurangan akademik, tekanan yang dialami korban sebelum meninggal.\n\n## Beban Internal / Dorongan Tersembunyi\nIngin sekali kasus ini 'menang', jadi berisiko terdengar bias saat bersaksi — bisa dimainkan sebagai kelemahan kesaksiannya di mata pembela.\n\n## Tujuan di Sidang\nMenunjukkan pola tekanan yang dialami korban dari tim Steve sebelum kematian.\n\n## Hubungan Antar Karakter\n- [[07 - Steve]] — Menyimpan amarah terpendam terhadap Steve dan circle-nya terkait laporan kecurangan.\n- [[16 - Elvin]] — Staf fakultas yang menangani laporan kecurangan akademik yang relevan dengan kesaksiannya.\n- [[10 - Jayden]] — Orang tua dari sahabatnya (korban).\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "16", "name": "Elvin", "peran": "Saksi dari Pihak Fakultas (laporan kecurangan akademik)", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 16. Elvin — Saksi dari Pihak Fakultas (laporan kecurangan akademik)\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n45 th, staf akademik yang menangani investigasi internal lomba riset.\n\n## Kepribadian\nProsedural, hati-hati bicara karena posisinya sebagai representasi institusi.\n\n## Yang Dia Ketahui\nDetail resmi proses investigasi kecurangan, hasil diskualifikasi tim Steve, kronologi administratif.\n\n## Tujuan di Sidang\nMemberi keterangan objektif soal proses akademik, sekaligus menjaga nama baik fakultas.\n\n## Hubungan Antar Karakter\n- [[07 - Steve]] — Timnya didiskualifikasi dari lomba riset akibat investigasi kecurangan yang ia tangani.\n- [[15 - Otniel]] — Kesaksiannya beririsan dengan cerita Otniel soal laporan kecurangan.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "17", "name": "Becky", "peran": "Saksi Teman Dekat Terdakwa (anggota circle)", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 17. Becky — Saksi Teman Dekat Terdakwa (anggota circle)\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n21 th, sahabat dekat Steve, kuliahnya selama ini dibantu biaya oleh keluarga Steve.\n\n## Kepribadian\nLoyal tapi penuh konflik batin, punya rasa hutang budi yang besar terhadap keluarga Terdakwa.\n\n## Yang Dia Ketahui\nAlibi asli Steve pada malam kejadian (versi yang benar-benar ia ketahui).\n\n## Beban Internal / Dorongan Tersembunyi\nJesslyn pernah menyinggung secara halus soal bantuan biaya kuliahnya, meminta Becky 'mengingat-ingat lagi' detail malam itu. Bagaimana Becky merespons di kursi saksi — jujur, berbohong, atau setengah-setengah — sepenuhnya keputusan saat itu.\n\n## Tujuan di Sidang\nBersaksi tanpa mengkhianati loyalitasnya pada Steve maupun hati nuraninya sendiri.\n\n## Hubungan Antar Karakter\n- [[07 - Steve]] — Sahabat dekat dalam circle-nya; mengetahui alibi asli malam kejadian.\n- [[11 - Jesslyn]] — Membantu biaya kuliahnya; menyinggung bantuan itu agar Becky 'mengingat-ingat lagi' malam kejadian.\n- [[05 - Kevin]] — Hakim yang mencurigai kemungkinan perubahan keterangannya di kursi saksi.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "18", "name": "Ken2", "peran": "Anggota Circle Terdakwa 1 (pengunjung, tidak bersaksi)", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 18. Ken2 — Anggota Circle Terdakwa 1 (pengunjung, tidak bersaksi)\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n21 th, bagian dari lingkaran pertemanan Steve yang berpengaruh secara sosial.\n\n## Kepribadian\nSantai di permukaan, tapi terbiasa menggunakan pengaruh sosial untuk menekan orang lain secara halus.\n\n## Yang Dia Ketahui\nBagian dari dinamika sosial di kampus terkait status keluarga Steve.\n\n## Tujuan di Sidang\nHanya sebagai pengunjung — tapi interaksinya di luar ruang sidang (mis. dengan saksi) bisa jadi bahan drama tersendiri.\n\n## Hubungan Antar Karakter\n- [[07 - Steve]] — Bagian dari lingkaran pertemanan dekatnya.\n- [[19 - Stefano]] — Sesama anggota circle Steve.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "19", "name": "Stefano", "peran": "Anggota Circle Terdakwa 2 (pengunjung, tidak bersaksi)", "kelompok": "Kelompok 5 — Saksi-saksi", "body": "# 19. Stefano — Anggota Circle Terdakwa 2 (pengunjung, tidak bersaksi)\n\n*Kelompok 5 — Saksi-saksi*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n22 th, sama seperti Ken2, bagian dari circle berpengaruh Steve.\n\n## Kepribadian\nLebih blak-blakan dan pragmatis, sering jadi yang 'bicara duluan' dalam situasi menekan.\n\n## Tujuan di Sidang\nPengunjung, dengan dinamika serupa Ken2.\n\n## Hubungan Antar Karakter\n- [[07 - Steve]] — Bagian dari lingkaran pertemanan dekatnya.\n- [[18 - Ken2]] — Sesama anggota circle Steve.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "20", "name": "Varren", "peran": "Saksi Ahli Forensik (dokter forensik/otopsi)", "kelompok": "Kelompok 6 — Ahli", "body": "# 20. Varren — Saksi Ahli Forensik (dokter forensik/otopsi)\n\n*Kelompok 6 — Ahli*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n50 th, dokter forensik senior dengan reputasi sangat dijaga, dikenal tidak bisa disuap.\n\n## Kepribadian\nBerintegritas tinggi, teguh pada data ilmiah, tidak segan menolak tekanan dari pihak manapun.\n\n## Yang Dia Ketahui\nHasil otopsi resmi: penyebab kematian akibat benda tumpul di belakang kepala, disusul kekerasan fisik lanjutan.\n\n## Beban Internal / Dorongan Tersembunyi\nCATATAN: karakter ini sengaja jadi kontras moral — kalau ada pihak yang mencoba mendekatinya selama simulasi, wajar baginya untuk menolak tegas atau bahkan melaporkannya, sesuai kepribadiannya.\n\n## Tujuan di Sidang\nMenyampaikan temuan ilmiah apa adanya, tanpa kompromi.\n\n## Hubungan Antar Karakter\n- [[01 - Alvino]] — Hasil otopsinya menjadi bagian dari bukti yang digunakan Jaksa Penuntut Umum.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "21", "name": "Yohana", "peran": "Saksi Ahli Digital Forensik (analisis CCTV)", "kelompok": "Kelompok 6 — Ahli", "body": "# 21. Yohana — Saksi Ahli Digital Forensik (analisis CCTV)\n\n*Kelompok 6 — Ahli*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n33 th, ahli forensik digital independen yang disewa untuk menganalisis rekaman CCTV kampus.\n\n## Kepribadian\nProfesional tapi punya tekanan finansial pribadi, tidak terbiasa berhadapan dengan situasi etis seberat ini.\n\n## Yang Dia Ketahui\nHasil analisis CCTV yang menunjukkan siapa yang terakhir bersama korban. Pernah didatangi seseorang yang menawarkan amplop dan meminta ia 'memperlambat proses' / bilang kualitas gambar rendah.\n\n## Beban Internal / Dorongan Tersembunyi\nIni keputusan paling krusial di tangan pemain — menerima, menolak, atau berpura-pura menerima lalu melapor, semua sah dimainkan.\n\n## Tujuan di Sidang\nMenyampaikan hasil forensik digital — dengan atau tanpa 'penyesuaian', tergantung keputusannya sendiri.\n\n## Hubungan Antar Karakter\n- [[11 - Jesslyn]] — Diduga sebagai pihak yang mengorkestrasi tawaran amplop kepadanya.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "22", "name": "Callysta", "peran": "Petugas Kepolisian yang Menangani TKP", "kelompok": "Kelompok 7 — Kepolisian & Petugas", "body": "# 22. Callysta — Petugas Kepolisian yang Menangani TKP\n\n*Kelompok 7 — Kepolisian & Petugas*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n30 th, polisi lapangan yang pertama menangani TKP di parkiran kampus.\n\n## Kepribadian\nBerpengalaman tapi bisa jadi kurang tegas kalau menghadapi tekanan sosial/finansial.\n\n## Yang Dia Ketahui\nKondisi asli TKP, barang bukti awal yang ditemukan, laporan yang ia buat.\n\n## Beban Internal / Dorongan Tersembunyi\nAda kemungkinan ia didekati untuk menunda laporan atau 'kehilangan' satu barang bukti kecil — ini bisa dimunculkan sebagai godaan situasional selama simulasi berjalan, bukan sesuatu yang sudah terjadi sebelumnya.\n\n## Tujuan di Sidang\nMelaporkan penanganan TKP secara akurat (atau tidak, tergantung keputusan di titik krusial itu).\n\n## Hubungan Antar Karakter\n- [[14 - Freya]] — Menangani TKP setelah menerima laporan dari Freya yang menemukan jenazah.\n- [[29 - Carsten]] — Moderator dapat membisikkan godaan situasional kepadanya di titik yang tepat.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "23", "name": "Abbymael", "peran": "Petugas Keamanan/Polisi Sidang 1", "kelompok": "Kelompok 7 — Kepolisian & Petugas", "body": "# 23. Abbymael — Petugas Keamanan/Polisi Sidang 1\n\n*Kelompok 7 — Kepolisian & Petugas*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n35 th, bertugas menjaga ketertiban ruang sidang.\n\n## Kepribadian\nDisiplin, waspada, jarang bicara kecuali situasi butuh penanganan.\n\n## Tujuan di Sidang\nMenjaga keamanan dan ketertiban — bisa jadi saksi pasif atas hal-hal janggal yang terjadi di sekitar ruang sidang.\n\n## Hubungan Antar Karakter\n- [[24 - Davin]] — Rekan sesama petugas keamanan sidang.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "24", "name": "Davin", "peran": "Petugas Keamanan/Polisi Sidang 2", "kelompok": "Kelompok 7 — Kepolisian & Petugas", "body": "# 24. Davin — Petugas Keamanan/Polisi Sidang 2\n\n*Kelompok 7 — Kepolisian & Petugas*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n33 th, rekan Abbymael, sama-sama menjaga jalannya sidang.\n\n## Kepribadian\nMirip Abbymael, sedikit lebih observatif terhadap detail kecil.\n\n## Tujuan di Sidang\nSama seperti Abbymael.\n\n## Hubungan Antar Karakter\n- [[23 - Abbymael]] — Rekan sesama petugas keamanan sidang.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "25", "name": "Olivia", "peran": "Petugas Absensi/Registrasi Sidang", "kelompok": "Kelompok 7 — Kepolisian & Petugas", "body": "# 25. Olivia — Petugas Absensi/Registrasi Sidang\n\n*Kelompok 7 — Kepolisian & Petugas*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n26 th, mengelola pendaftaran pengunjung dan kehadiran pihak-pihak sidang.\n\n## Kepribadian\nRamah, administratif, teliti mencatat siapa hadir dan kapan.\n\n## Tujuan di Sidang\nMencatat kehadiran secara akurat — perannya fungsional tapi bisa jadi sumber info kecil (mis. siapa yang datang lebih awal/telat) kalau dibutuhkan drama.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "26", "name": "Ben", "peran": "Juru Foto/Media 1", "kelompok": "Kelompok 8 — Media", "body": "# 26. Ben — Juru Foto/Media 1\n\n*Kelompok 8 — Media*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n27 th, fotografer lepas yang meliput sidang-sidang besar.\n\n## Kepribadian\nCari momen dramatis untuk foto, netral secara politik.\n\n## Tujuan di Sidang\nMengabadikan momen-momen kunci sidang.\n\n## Hubungan Antar Karakter\n- [[27 - Raphael]] — Rekan kerja sesama juru foto media.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "27", "name": "Raphael", "peran": "Juru Foto/Media 2", "kelompok": "Kelompok 8 — Media", "body": "# 27. Raphael — Juru Foto/Media 2\n\n*Kelompok 8 — Media*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n29 th, rekan kerja Ben, sama-sama meliput visual sidang.\n\n## Kepribadian\nMirip Ben, sedikit lebih senior dan tahu momen mana yang 'layak jual'.\n\n## Tujuan di Sidang\nSama seperti Ben.\n\n## Hubungan Antar Karakter\n- [[26 - Ben]] — Rekan kerja sesama juru foto media.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "28", "name": "Jessica", "peran": "Wartawan yang Meliput Sidang", "kelompok": "Kelompok 8 — Media", "body": "# 28. Jessica — Wartawan yang Meliput Sidang\n\n*Kelompok 8 — Media*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\n32 th, jurnalis dari media nasional, dikenal cukup independen.\n\n## Kepribadian\nSkeptis profesional, mengejar sudut pandang berimbang, tapi juga butuh berita yang menarik pembaca.\n\n## Yang Dia Ketahui\nPerkembangan kasus dari sisi publik. Pernah dihubungi pihak humas keluarga Terdakwa yang menawarkan 'dukungan liputan independen'.\n\n## Beban Internal / Dorongan Tersembunyi\nTawaran itu bisa ia terima secara naif, curigai, atau justru jadikan bahan investigasi tersendiri — keputusan saat itu.\n\n## Tujuan di Sidang\nMeliput secara adil, sambil menimbang tawaran yang ia terima.\n\n## Hubungan Antar Karakter\n- [[11 - Jesslyn]] — Dihubungi pihak humas keluarga Jesslyn yang menawarkan 'dukungan liputan independen'.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}, {"num": "29", "name": "Carsten", "peran": "Moderator/Pengamat Simulasi", "kelompok": "Moderator", "body": "# 29. Carsten — Moderator/Pengamat Simulasi\n\n*Moderator*\n\n> [!warning] Rahasia\n> Lembar ini **hanya** untuk pemeran yang bersangkutan. Jangan dibaca pemain lain.\n\n## Usia / Latar Belakang\nBukan bagian dari dunia cerita — ini 'wasit' simulasi.\n\n## Kepribadian\nObjektif, memegang kendali alur, tidak memihak.\n\n## Yang Dia Ketahui\nSatu-satunya yang boleh tahu keseluruhan skenario, karena tugasnya menjaga alur, memberi info tambahan ke tokoh tertentu secara diam-diam bila diperlukan (mis. membisikkan godaan ke Callysta di titik yang tepat), dan menengahi bila ada pemain yang bingung dengan perannya.\n\n## Tujuan di Sidang\nMenjaga simulasi tetap berjalan dinamis dan adil bagi semua pemeran. Pegang dokumen 'Panduan Moderator & Clue' secara terpisah.\n\n## Hubungan Antar Karakter\n- [[22 - Callysta]] — Dapat membisikkan info tambahan/godaan kepadanya secara diam-diam di titik yang tepat.\n\n---\n*Catatan: keputusan aktingmu di sidang bebas — informasi di atas adalah dorongan, bukan skrip wajib.*"}];
+const SCENARIOS = [{"ver": "1.0", "title": "Sidang 1.0 Skenario Sapu Bersih", "body": "1. Setiap peran yang mendapatkan **suap** terpengaruh dan melakukan hal yang menguntungkan bagi tersangka 07 \\- Steve.  \n2. Setiap peran yang mengalami **intimidasi** dari pihak tersangka terpengaruh dan memberikan kesaksian palsu yang menguntungkan Steve karena mental mereka terganggu.\n\n**Akhir:** Steve dinyatakan **tidak bersalah**, seluruh skema berjalan mulus tanpa ada yang bocor.", "gimik": ""}, {"ver": "2.0", "title": "Sidang 2.0 Satu Retakan di Tembok", "body": "1. Semua peran yang disuap tetap patuh seperti Versi 1.0 (Alice, Nikey, Phillip, Becky, Jessica).\n2. Namun **satu** peran yang diintimidasi (misalnya Kaylee) tidak tunduk dan tetap bersaksi jujur soal konfrontasi Steve dengan korban.\n3. Kesaksian jujur ini dianggap \"kata-satu-orang\" tanpa bukti pendukung karena semua bukti forensik (Yohana) & alibi (Becky) sudah diarahkan menguntungkan Steve.\n4. Hakim Kevin mencatat kejanggalan tapi tidak cukup untuk membalikkan keputusan.\n\n**Akhir:** Steve tetap dinyatakan **tidak bersalah**, tapi ada \"noda\" keraguan publik yang tidak pernah terbukti — cerita menggantung, bisa jadi bahan sekuel/season 2.", "gimik": ""}, {"ver": "3.0", "title": "Sidang 3.0 Bom Waktu Meledak di Tengah Sidang", "body": "1. Semua suap & intimidasi tetap berjalan sesuai rencana Jesslyn di awal.\n2. Yohana, saksi forensik yang menerima amplop, tiba-tiba **membongkar suap tersebut secara terbuka** di depan Hakim saat Sidang 2.\n3. Efek domino: Nikey (eksekutor suap) langsung terekspos, menyeret nama Alice meski ia tak terlibat langsung.\n4. Media (Jessica), meski awalnya menerima \"dukungan finansial\", terpaksa memberitakan kejadian ini karena sudah terjadi di ruang sidang terbuka tak bisa ditutup lagi.\n\n**Akhir:** Sidang ditunda, kasus suap-menyuap baru dibuka terhadap Nikey & Jesslyn. Steve **belum tentu bebas** — kasusnya kini tersandera oleh skandal baru yang justru memperkuat kecurigaan terhadap dirinya.", "gimik": ""}, {"ver": "4.0", "title": "Sidang 4.0 Sang Jaksa Membalas", "body": "1. Phillip (jaksa) menerima tawaran donasi yayasan dari Jesslyn seperti direncanakan.\n2. Namun alih-alih melemahkan tuntutan, Phillip diam-diam **membocorkan percobaan suap ini ke Alvino**, rekan jaksanya.\n3. Alvino menyimpan bukti dan baru membukanya di titik paling krusial — saat pembacaan tuntutan akhir.\n4. Semua saksi lain (Kaylee, Becky, Yohana) tetap tunduk pada tekanan/suap seperti skenario awal, sehingga kesaksian mereka tetap menguntungkan Steve.\n\n**Akhir:** Karena bukti kesaksian tetap menguntungkan Steve, hakim tetap condong pada pembebasan — namun pembongkaran suap oleh Alvino membuka **penyelidikan etik terpisah** terhadap tim pengacara Steve pasca-sidang. Steve bebas secara hukum, tapi kasus \"belum benar-benar selesai\".", "gimik": ""}, {"ver": "5.0", "title": "Sidang 5.0 Efek Domino Total (Semua Retak)", "body": "1. Yohana membongkar amplop suap di depan Hakim (seperti Versi 3.0).\n2. Terinspirasi keberanian Yohana, Kaylee ikut bersaksi jujur soal intimidasi & konfrontasi Steve dengan korban.\n3. Becky, melihat dua saksi lain berani, akhirnya memilih jujur bahwa Steve tidak bersamanya malam kejadian — alibi utama runtuh total.\n4. Jessica yang awalnya diam-diam investigasi (bukan menerima suap begitu saja) merilis semua temuan bukti finansial dari Jesslyn tepat sebelum putusan dibacakan.\n\n**Akhir:** Seluruh skema suap & intimidasi terbongkar bersamaan. Steve dinyatakan **bersalah**, dan Jesslyn beserta Nikey, Ken2, dan Stefano menghadapi dakwaan tambahan atas obstruksi keadilan.", "gimik": ""}, {"ver": "6.0", "title": "Sidang 6.0 Kesaksian Bertabrakan (Kontradiksi Terbuka)", "body": "1. Becky memilih memberi **alibi palsu** (Cabang A) demi balas budi ke Jesslyn.\n2. Namun Kaylee, di sisi lain, memilih tetap jujur bersaksi bahwa ia melihat langsung konfrontasi Steve dengan korban pada waktu yang sama dengan alibi Becky.\n3. Dua kesaksian ini saling bertabrakan secara langsung di ruang sidang — satu bilang Steve ada di tempat lain, satu bilang Steve ada di lokasi kejadian.\n4. Hakim Kevin mendesak keduanya dengan pertanyaan tajam, memaksa salah satu (atau keduanya) menunjukkan tanda-tanda kebohongan.\n\n**Akhir:** Karena ada kontradiksi nyata yang tidak bisa diabaikan, hakim menyatakan keraguan besar terhadap kredibilitas pembelaan Steve. Kasus berpotensi **ditunda untuk investigasi ulang**, bukan langsung diputus bebas atau bersalah — status Steve jadi abu-abu (\"non-liquet\" / belum terbukti keduanya).", "gimik": ""}, {"ver": "7.0", "title": "Sidang 7.0 Sabotase dari Dalam", "body": "1. Alice, meski awalnya diperintahkan Jesslyn untuk menggunakan \"jalur luar\", justru mulai ragu-ragu dan sengaja membuat kesalahan prosedural kecil yang menguntungkan pihak jaksa.\n2. Nikey tidak menyadari sabotase ini sampai terlambat.\n3. Semua saksi lain (Yohana, Kaylee, Becky) tetap tunduk pada suap/intimidasi seperti skenario awal — dari luar terlihat semua berjalan sesuai rencana Jesslyn.\n4. Kesalahan prosedural Alice membuka celah hukum yang dimanfaatkan Phillip untuk mengajukan bukti tambahan di menit-menit akhir.\n\n**Akhir:** Steve nyaris bebas, namun karena celah prosedural yang dibuka Alice, hakim memutuskan **sidang lanjutan / banding otomatis** — belum ada keputusan final, ketegangan berlanjut ke babak berikutnya.", "gimik": ""}, {"ver": "8.0", "title": "Sidang 8.0 Media Duluan, Semua Kalang Kabut", "body": "1. Jessica, alih-alih menunggu, langsung membongkar tawaran \"dukungan finansial\" dari Jesslyn ke publik **sebelum Sidang 2 dimulai**.\n2. Berita ini membuat tekanan publik sangat besar terhadap seluruh proses persidangan.\n3. Karena sorotan publik, Phillip (jaksa) yang awalnya berencana melemahkan tuntutan jadi tidak berani melakukannya secara terang-terangan.\n4. Namun saksi-saksi lain (Yohana, Kaylee, Becky) yang sudah kadung disuap/diintimidasi secara personal (bukan finansial terbuka) tetap memberi kesaksian yang menguntungkan Steve, karena tekanan personal berbeda dari tekanan opini publik.\n\n**Akhir:** Hasil persidangan tetap **menguntungkan Steve secara teknis** (bebas), tapi opini publik sudah kadung negatif — kemenangan hukum yang \"kosong\", membuka ruang cerita lanjutan soal reputasi keluarga Steve yang hancur meski menang di pengadilan.", "gimik": ""}, {"ver": "9.0", "title": "Sidang 9.0 Keberanian yang Terlambat", "body": "1. Semua peran (Alice, Yohana, Phillip, Kaylee, Becky, Jessica) awalnya sepenuhnya tunduk pada suap/intimidasi tepat seperti Versi 1.0, dan sidang hampir selesai dengan vonis bebas.\n2. Namun tepat sebelum palu diketuk, salah satu dari mereka (bisa dipilih moderator secara dramatis, misalnya Becky) tiba-tiba berubah pikiran dan mencabut kesaksiannya di detik-detik terakhir.\n3. Perubahan mendadak ini mengejutkan seluruh ruang sidang, termasuk Jesslyn & tim Steve yang sudah merasa aman.\n4. Hakim Kevin menskors sidang untuk mempertimbangkan keterangan baru ini.\n\n**Akhir:** Ketidakpastian total — bisa berujung penundaan putusan, sidang ulang, atau bahkan pembatalan seluruh proses (mistrial) tergantung reaksi pihak lain setelahnya. Versi ini paling cocok untuk momen klimaks dramatis di penghujung sesi.", "gimik": ""}];
+const DOCS = {"rundown": [{"type": "heading", "level": "Title", "text": "RUNDOWN SIMULASI SIDANG"}, {"type": "p", "level": "Normal", "text": "PPKN — \"Kekuasaan di Atas Hukum\" — 3 Sidang, ±20 menit per sidang"}, {"type": "heading", "level": "Heading 1", "text": "Struktur Besar"}, {"type": "p", "level": "Normal", "text": "SIDANG 1 (Fakta di Permukaan) → JEDA 1 (Clue Paket A) → SIDANG 2 (Retakan Mulai Terlihat) → JEDA 2 (Clue Paket B) → SIDANG 3 (Titik Balik & Putusan)"}, {"type": "heading", "level": "Heading 1", "text": "SIDANG 1 — Fakta di Permukaan (±20 menit)"}, {"type": "p", "level": "Normal", "text": "Fokus: dakwaan, kronologi, TKP, otopsi. Belum ada bau kecurangan sidang. Guru dapat gambaran kasus \"biasa\" dengan motif jelas, tapi bukti fisik lemah."}, {"type": "table", "rows": [["Menit", "Agenda"], ["0–3", "Pembukaan sidang, pembacaan dakwaan ringkas (Alvino)"], ["3–8", "Keterangan Freya (penemu jenazah)"], ["8–14", "Keterangan Callysta (TKP)"], ["14–19", "Keterangan Varren (otopsi, ringkas)"], ["19–20", "Hakim skors → JEDA 1"]]}, {"type": "p", "level": "Normal", "text": "→ JEDA 1: buka Clue Paket A (lihat dokumen Panduan Moderator & Clue)"}, {"type": "heading", "level": "Heading 1", "text": "SIDANG 2 — Retakan Mulai Terlihat (±20 menit)"}, {"type": "p", "level": "Normal", "text": "Fokus: kesaksian mata & ahli — titik keputusan krusial terjadi live di sini (Yohana & Becky). Hasilnya menentukan varian Clue Paket B yang dibuka di jeda berikutnya."}, {"type": "table", "rows": [["Menit", "Agenda"], ["0–7", "Keterangan Kaylee & Natalee (konfrontasi Aula, bergantian)"], ["7–14", "Keterangan Yohana (CCTV) — titik keputusan kunci"], ["14–19", "Keterangan Becky (alibi Steve) — titik keputusan kunci"], ["19–20", "Hakim skors → JEDA 2"]]}, {"type": "p", "level": "Normal", "text": "→ JEDA 2: pilih varian B1 / B2 / B3 sesuai apa yang benar-benar terjadi (lihat dokumen Panduan Moderator & Clue)"}, {"type": "heading", "level": "Heading 1", "text": "SIDANG 3 — Titik Balik & Putusan (±20 menit)"}, {"type": "p", "level": "Normal", "text": "Fokus: pembelaan, saksi tambahan bila perlu, tuntutan, musyawarah & putusan hakim di depan \"juri\" guru."}, {"type": "table", "rows": [["Menit", "Agenda"], ["0–5", "Keterangan Otniel / Elvin (motif, ringkas — pilih salah satu sesuai kebutuhan waktu)"], ["5–10", "Pembelaan Alice/Nikey + keterangan Steve"], ["10–15", "Tuntutan Alvino/Phillip"], ["15–20", "Musyawarah & putusan hakim"]]}, {"type": "heading", "level": "Heading 1", "text": "Kemungkinan Akhir (tidak ditentukan di awal — murni hasil keputusan pemain di kedua jeda)"}, {"type": "p", "level": "Normal", "text": "1. Steve terbukti bersalah murni dari bukti fisik & kesaksian yang tetap solid."}, {"type": "p", "level": "Normal", "text": "2. Steve lolos karena manipulasi berhasil (tergantung berapa banyak saksi yang goyah) — bagus untuk diskusi PPKN soal \"keadilan yang bisa dibeli\"."}, {"type": "p", "level": "Normal", "text": "3. Manipulasi justru terbongkar di tengah jalan (mis. Yohana blak-blakan, atau Jessica mengungkap tawaran yang ia terima) — jadi klimaks besar."}, {"type": "p", "level": "Normal", "text": "Catatan: Elvin dan Otniel bergantian tampil di Sidang 3 karena keterbatasan waktu — bisa juga info mereka disampaikan lewat dokumen yang dibacakan jaksa di pembukaan Sidang 1, bukan testimoni langsung."}], "panduan_clue": [{"type": "heading", "level": "Title", "text": "PANDUAN MODERATOR & PAKET CLUE"}, {"type": "p", "level": "Normal", "text": "Khusus untuk Carsten (Moderator/Pengamat Simulasi) — TIDAK dibagikan ke pemeran lain"}, {"type": "heading", "level": "Heading 1", "text": "Peran Anda sebagai Moderator"}, {"type": "p", "level": "Normal", "text": "Anda adalah satu-satunya yang boleh tahu keseluruhan skenario dasar. Tugas Anda: menjaga alur waktu, mengamati keputusan live tiap pemeran di Sidang 2, memilih varian clue yang paling sesuai untuk Jeda 2, dan membisikkan \"godaan situasional\" ke tokoh tertentu bila momennya pas (misalnya ke Callysta soal barang bukti). Semua clue dirancang agar guru/juri merasa aktif menyelidiki — bukan menonton hasil yang sudah pasti."}, {"type": "heading", "level": "Heading 1", "text": "JEDA 1 — Clue Paket A (selalu dibuka, apa pun jalur cerita)"}, {"type": "p", "level": "Normal", "text": "Dibuka setelah Sidang 1 selesai. Bentuk: amplop coklat bertuliskan \"BUKTI TAMBAHAN – TERBATAS\" + satu rekaman audio pendek diputar dari HP/speaker."}, {"type": "heading", "level": "Heading 2", "text": "Isi Amplop (cetak 2 lembar)"}, {"type": "p", "level": "Normal", "text": "1. Cuplikan log CCTV — tabel timestamp dengan satu baris disorot:"}, {"type": "p", "level": "Normal", "text": "23:40–23:55 — kualitas gambar rendah, tidak dapat diverifikasi analis."}, {"type": "p", "level": "Normal", "text": "2. Salinan pesan singkat (fiktif) H-2 antara Steve dan korban B — nada tegang, tidak eksplisit mengancam. Contoh yang bisa dipakai (sesuaikan gaya bahasa):"}, {"type": "p", "level": "Normal", "text": "Steve: \"Lo pikir laporan lo itu bakal bikin lo keren? Cari sensasi doang.\"\nKorban B: \"Aku cuma jujur soal apa yang aku lihat. Itu aja.\""}, {"type": "heading", "level": "Heading 2", "text": "Naskah Audio (±20 detik)"}, {"type": "p", "level": "Normal", "text": "Diputar seolah rekaman CCTV lorong dekat parkiran, dua jam sebelum kejadian. Suara latar berisik, dua suara samar bertengkar tidak jelas, terputus bunyi statis."}, {"type": "p", "level": "Normal", "text": "Narator/Carsten: \"Ini rekaman dari CCTV lorong dekat parkiran, dua jam sebelum kejadian. Analis belum bisa memastikan siapa suara di dalamnya.\""}, {"type": "p", "level": "Normal", "text": "Efek yang diharapkan: guru membangun teori motif dulu, tanpa menyentuh isu suap sama sekali — pembukaan khas game detektif."}, {"type": "heading", "level": "Heading 1", "text": "JEDA 2 — Clue Paket B (pilih SATU varian sesuai apa yang terjadi di Sidang 2)"}, {"type": "heading", "level": "Heading 2", "text": "Varian B1 — jika Yohana tampak menahan sesuatu / jawabannya janggal"}, {"type": "p", "level": "Normal", "text": "Amplop: \"Laporan forensik digital versi lengkap\" yang bocor entah dari mana — isinya hasil analisis yang berbeda dari yang disampaikan Yohana di sidang (mis. menyebut identitas lebih jelas di segmen yang tadi ia bilang \"buram\")."}, {"type": "p", "level": "Normal", "text": "Naskah Audio (±15 detik), suara distorsi seperti sadapan telepon:"}, {"type": "p", "level": "Normal", "text": "\"...tolong perlambat saja prosesnya... bilang kualitas gambarnya kurang...\" (terputus)"}, {"type": "p", "level": "Normal", "text": "Efek: guru langsung menaruh curiga ke Yohana secara spesifik."}, {"type": "heading", "level": "Heading 2", "text": "Varian B2 — jika Becky tampak kontradiksi dengan kesaksian awal"}, {"type": "p", "level": "Normal", "text": "Amplop: Salinan BAP awal Becky (prop buatan Anda) yang isinya berbeda dari kesaksiannya hari ini di sidang. Tidak perlu audio — cukup dokumen tertulis agar guru membandingkan sendiri dua versi kata-kata Becky."}, {"type": "p", "level": "Normal", "text": "Efek: guru mulai curiga ada tekanan terhadap saksi dari pihak Terdakwa."}, {"type": "heading", "level": "Heading 2", "text": "Varian B3 — jika semua saksi konsisten (jalur \"bersih\", tidak ada yang goyah)"}, {"type": "p", "level": "Normal", "text": "Amplop: Laporan donasi mendadak ke yayasan tempat Phillip mengajar, jumlahnya signifikan, tanggalnya berdekatan dengan tanggal sidang."}, {"type": "p", "level": "Normal", "text": "Naskah Audio, cuplikan obrolan santai di restoran (rekonstruksi, bukan asli):"}, {"type": "p", "level": "Normal", "text": "\"...saya dengar yayasan Bapak butuh donatur untuk gedung baru...\""}, {"type": "p", "level": "Normal", "text": "Efek: membuka arah kecurigaan baru sama sekali — ke jalur penuntut umum, bukan ke saksi — agar guru tidak merasa sudah menebak semuanya."}, {"type": "heading", "level": "Heading 2", "text": "Aturan Pemilihan Varian"}, {"type": "p", "level": "Normal", "text": "Amati Sidang 2 secara live, pilih varian yang paling sesuai dengan apa yang benar-benar terjadi (bukan direncanakan sebelumnya). Kalau dua kondisi terjadi sekaligus (mis. Yohana DAN Becky goyah), gabungkan isi amplop B1+B2 jadi satu paket lebih tebal."}, {"type": "heading", "level": "Heading 1", "text": "Godaan Situasional Opsional (dimainkan bila momennya pas)"}, {"type": "p", "level": "Normal", "text": "Callysta bisa didekati (oleh Ken2/Stefano atau \"utusan\") di sela sidang untuk menunda laporan atau \"kehilangan\" satu barang bukti kecil — ini belum terjadi di skenario dasar, jadi wajar dimunculkan kapan saja Anda rasa pas untuk menambah ketegangan, terutama menjelang Sidang 3."}, {"type": "p", "level": "Normal", "text": "Jessica (wartawan) bisa didekati pihak humas keluarga Terdakwa yang menawarkan \"dukungan liputan independen\" — bisa jadi bahan pertanyaan tambahan di Sidang 3 kalau ingin menambah kejutan."}, {"type": "heading", "level": "Heading 1", "text": "Checklist Persiapan Fisik"}, {"type": "p", "level": "Normal", "text": "☐ Amplop Clue Paket A (2 lembar dokumen)"}, {"type": "p", "level": "Normal", "text": "☐ Rekaman audio Clue Paket A (±20 detik)"}, {"type": "p", "level": "Normal", "text": "☐ Amplop Clue Paket B1, B2, B3 (siapkan ketiganya, pakai sesuai kebutuhan)"}, {"type": "p", "level": "Normal", "text": "☐ Rekaman audio B1 dan B3"}, {"type": "p", "level": "Normal", "text": "☐ Prop BAP awal Becky (untuk B2)"}, {"type": "p", "level": "Normal", "text": "☐ Timer/pengingat waktu 20 menit per sidang"}], "naskah_rahasia": [{"type": "heading", "level": "Title", "text": "NASKAH PERTEMUAN RAHASIA"}, {"type": "p", "level": "Normal", "text": "Simulasi Sidang PPKN — \"Kekuasaan di Atas Hukum\""}, {"type": "p", "level": "Normal", "text": "Setiap pertemuan di bawah ini HANYA dibagikan ke peran yang disebutkan. Ini bukan dialog wajib kata-per-kata — gunakan situasi & starter percakapan sebagai pemantik, lalu biarkan keputusan mengalir sesuai karakter masing-masing."}, {"type": "heading", "level": "Heading 1", "text": "1. Menyusun Rencana dengan Pengacara"}, {"type": "p", "level": "Normal", "text": "🔒 RAHASIA — HANYA UNTUK: Jesslyn, Alice, Nikey. Jangan dibagikan ke pemeran lain."}, {"type": "p", "level": "Normal", "text": "Lokasi: Ruang kerja pribadi Jesslyn"}, {"type": "p", "level": "Normal", "text": "Waktu: Beberapa hari setelah Steve ditetapkan sebagai terduga"}, {"type": "heading", "level": "Heading 2", "text": "Konteks"}, {"type": "p", "level": "Normal", "text": "Jesslyn memanggil kedua pengacara Steve untuk membahas strategi pembelaan. Ia ingin memastikan mereka bukan sekadar pengacara yang bekerja di dalam ruang sidang saja."}, {"type": "heading", "level": "Heading 2", "text": "Starter Percakapan (pemantik, bukan naskah wajib)"}, {"type": "p", "level": "Normal", "text": "JESSLYN: \"Saya tidak butuh pengacara yang cuma baca undang-undang di ruang sidang. Saya butuh yang bisa bermain di luar ruang sidang juga.\"\nALICE: \"Bu, secara hukum kita bisa mainkan celah motif dan rekonstruksi kejadian. Tapi kalau Ibu maksudnya... jalur lain—\"\nNIKEY: \"Kami mengerti maksud Ibu. Tapi setiap 'jalur lain' itu ada risikonya.\""}, {"type": "heading", "level": "Heading 2", "text": "Titik Keputusan"}, {"type": "p", "level": "Normal", "text": "• Alice & Nikey: menerima permintaan Jesslyn secara implisit, menawar batasan, atau menolak halus?"}, {"type": "p", "level": "Normal", "text": "• Jesslyn: seberapa eksplisit ia menyampaikan keinginannya di pertemuan ini?"}, {"type": "p", "level": "Normal", "text": "• Apakah salah satu pengacara (kemungkinan besar Nikey) akan jadi \"utusan\" untuk mendekati pihak lain nanti?"}, {"type": "heading", "level": "Heading 2", "text": "Terhubung ke"}, {"type": "p", "level": "Normal", "text": "Menentukan gaya pembelaan Alice/Nikey di ruang sidang, dan apakah Pertemuan 2 (ke Yohana) benar-benar terjadi."}, {"type": "heading", "level": "Heading 1", "text": "2. Melobi Saksi Ahli Digital Forensik (CCTV)"}, {"type": "p", "level": "Normal", "text": "🔒 RAHASIA — HANYA UNTUK: Nikey (sebagai utusan Jesslyn), Yohana. Jangan dibagikan ke pemeran lain."}, {"type": "p", "level": "Normal", "text": "Lokasi: Kafe sepi"}, {"type": "p", "level": "Normal", "text": "Waktu: Siang hari, menjelang Sidang 2"}, {"type": "heading", "level": "Heading 2", "text": "Konteks"}, {"type": "p", "level": "Normal", "text": "Atas arahan Jesslyn, Nikey menemui Yohana yang sedang menganalisis rekaman CCTV kampus terkait malam kejadian."}, {"type": "heading", "level": "Heading 2", "text": "Starter Percakapan (pemantik, bukan naskah wajib)"}, {"type": "p", "level": "Normal", "text": "NIKEY: \"Anggap saja ini... apresiasi atas kerja keras Anda menganalisis rekaman yang buram itu. Kami paham, hasil forensik digital itu kadang bisa 'ditafsirkan' beberapa cara, kan?\"\nYOHANA: \"Rekaman itu jelas menunjukkan siapa yang terakhir bersama korban. Saya nggak bisa ubah laporan resmi begitu saja.\"\nNIKEY: \"Tidak ada yang minta Anda ubah laporan. Cukup... perlambat prosesnya.\""}, {"type": "heading", "level": "Heading 2", "text": "Titik Keputusan"}, {"type": "p", "level": "Normal", "text": "• Yohana: menerima amplop, menolak tegas, atau berpura-pura menerima sambil berencana melapor?"}, {"type": "p", "level": "Normal", "text": "• Bagaimana keputusan ini nanti tercermin lewat cara Yohana menjawab pertanyaan di Sidang 2?"}, {"type": "heading", "level": "Heading 2", "text": "Terhubung ke"}, {"type": "p", "level": "Normal", "text": "Menentukan varian Clue Paket B1 di Jeda 2 (lihat Panduan Moderator & Clue) — apakah Yohana tampak menahan sesuatu di Sidang 2."}, {"type": "heading", "level": "Heading 1", "text": "3. Mendekati Jaksa"}, {"type": "p", "level": "Normal", "text": "🔒 RAHASIA — HANYA UNTUK: Jesslyn, Phillip. Jangan dibagikan ke pemeran lain."}, {"type": "p", "level": "Normal", "text": "Lokasi: Restoran mahal — pertemuan yang terlihat \"tidak sengaja\""}, {"type": "p", "level": "Normal", "text": "Waktu: Malam hari, sebelum Sidang 2"}, {"type": "heading", "level": "Heading 2", "text": "Konteks"}, {"type": "p", "level": "Normal", "text": "Jesslyn mengatur agar bertemu Phillip di tempat makan yang sama, lalu mengarahkan obrolan ke topik donasi untuk yayasan tempat Phillip mengajar."}, {"type": "heading", "level": "Heading 2", "text": "Starter Percakapan (pemantik, bukan naskah wajib)"}, {"type": "p", "level": "Normal", "text": "JESSLYN: \"Pak Phillip, kebetulan sekali. Saya dengar kasus anak saya yang menangani Bapak dan Pak Alvino, ya? Saya cuma mau bilang, saya percaya betul dengan proses hukum yang adil dan objektif.\"\nPHILLIP: \"Kami akan bekerja sesuai bukti, Bu.\"\nJESSLYN: \"Tentu saja. Oh ya, saya dengar yayasan tempat Bapak biasa mengajar butuh donatur untuk gedung baru. Kebetulan saya senang membantu hal-hal semacam itu, tanpa pamrih tentunya.\""}, {"type": "heading", "level": "Heading 2", "text": "Titik Keputusan"}, {"type": "p", "level": "Normal", "text": "• Phillip: menanggapi tawaran itu sebagai basa-basi biasa, mulai waspada, atau diam-diam tergoda?"}, {"type": "p", "level": "Normal", "text": "• Apakah Phillip menceritakan pertemuan ini ke Alvino (rekan jaksanya) atau menyimpannya sendiri?"}, {"type": "heading", "level": "Heading 2", "text": "Terhubung ke"}, {"type": "p", "level": "Normal", "text": "Menentukan varian Clue Paket B3 di Jeda 2 — dibuka kalau jalur saksi \"bersih\" tapi kecurigaan perlu diarahkan ke jaksa."}, {"type": "heading", "level": "Heading 1", "text": "4. Mengintimidasi Saksi Mata (lewat Circle Terdakwa)"}, {"type": "p", "level": "Normal", "text": "🔒 RAHASIA — HANYA UNTUK: Ken2, Stefano, Kaylee. Jangan dibagikan ke pemeran lain."}, {"type": "p", "level": "Normal", "text": "Lokasi: Area parkir kampus"}, {"type": "p", "level": "Normal", "text": "Waktu: Malam, beberapa hari sebelum Sidang 2"}, {"type": "heading", "level": "Heading 2", "text": "Konteks"}, {"type": "p", "level": "Normal", "text": "Ken2 dan Stefano menghadang Kaylee, menyinggung soal kesaksiannya terkait konfrontasi di Aula, tanpa ancaman fisik langsung — hanya tekanan sosial."}, {"type": "heading", "level": "Heading 2", "text": "Starter Percakapan (pemantik, bukan naskah wajib)"}, {"type": "p", "level": "Normal", "text": "KEN2: \"Kaylee, kan? Denger-denger kamu 'lihat' sesuatu di Aula waktu itu.\"\nKAYLEE: \"A-aku cuma bilang apa yang aku lihat ke polisi...\"\nSTEFANO: \"Ingat aja, kampus ini kecil. Keluarga Steve itu... berpengaruh, di mana-mana. Kadang lebih aman kalau ingatan kita nggak terlalu jelas soal detail-detail kecil.\""}, {"type": "heading", "level": "Heading 2", "text": "Titik Keputusan"}, {"type": "p", "level": "Normal", "text": "• Kaylee: tetap teguh dengan kesaksian awal, mulai ragu-ragu, atau memilih diam soal detail tertentu?"}, {"type": "p", "level": "Normal", "text": "• Apakah Kaylee menceritakan kejadian ini ke siapa pun sebelum bersaksi (mis. ke Natalee)?"}, {"type": "heading", "level": "Heading 2", "text": "Terhubung ke"}, {"type": "p", "level": "Normal", "text": "Memengaruhi cara Kaylee menjawab di Sidang 2 — bisa dilihat lewat bahasa tubuh/keraguannya oleh Hakim Kevin."}, {"type": "heading", "level": "Heading 1", "text": "5. Menekan Saksi dari Pihak Terdakwa Sendiri"}, {"type": "p", "level": "Normal", "text": "🔒 RAHASIA — HANYA UNTUK: Jesslyn, Becky. Jangan dibagikan ke pemeran lain."}, {"type": "p", "level": "Normal", "text": "Lokasi: Rumah Becky"}, {"type": "p", "level": "Normal", "text": "Waktu: Sore hari, menjelang Sidang 2"}, {"type": "heading", "level": "Heading 2", "text": "Konteks"}, {"type": "p", "level": "Normal", "text": "Jesslyn mengunjungi Becky, sahabat dekat Steve yang biaya kuliahnya selama ini dibantu keluarga Steve, untuk meminta Becky 'mengingat ulang' alibi Steve."}, {"type": "heading", "level": "Heading 2", "text": "Starter Percakapan (pemantik, bukan naskah wajib)"}, {"type": "p", "level": "Normal", "text": "JESSLYN: \"Becky, kamu sudah seperti anak sendiri buat Tante. Tante cuma minta satu hal — waktu kamu bersaksi nanti, coba diingat-ingat lagi, bukannya malam itu Steve bilang dia di kosan kamu sampai larut?\"\nBECKY: \"Tante... itu bukan yang terjadi.\"\nJESSLYN: \"Tante tahu. Tapi ingat siapa yang bantu biaya kuliahmu selama ini, Becky.\""}, {"type": "heading", "level": "Heading 2", "text": "Titik Keputusan"}, {"type": "p", "level": "Normal", "text": "• Becky: tetap dengan alibi asli, mengikuti versi Jesslyn, atau memberi kesaksian yang setengah-setengah/kontradiktif?"}, {"type": "p", "level": "Normal", "text": "• Bagaimana Becky menghadapi rasa bersalah ini saat benar-benar duduk di kursi saksi?"}, {"type": "heading", "level": "Heading 2", "text": "Terhubung ke"}, {"type": "p", "level": "Normal", "text": "Menentukan varian Clue Paket B2 di Jeda 2 — dibuka kalau Becky terlihat kontradiksi dengan BAP awalnya di Sidang 2."}, {"type": "heading", "level": "Heading 1", "text": "6. Mengatur Narasi Media (Opsional/Bonus)"}, {"type": "p", "level": "Normal", "text": "🔒 RAHASIA — HANYA UNTUK: Jesslyn, Jessica. Jangan dibagikan ke pemeran lain."}, {"type": "p", "level": "Normal", "text": "Lokasi: Kantor humas keluarga"}, {"type": "p", "level": "Normal", "text": "Waktu: Sebelum Sidang 3"}, {"type": "heading", "level": "Heading 2", "text": "Konteks"}, {"type": "p", "level": "Normal", "text": "Jesslyn menghubungi Jessica, wartawan yang meliput sidang, menawarkan 'dukungan' untuk liputan yang dianggapnya independen."}, {"type": "heading", "level": "Heading 2", "text": "Starter Percakapan (pemantik, bukan naskah wajib)"}, {"type": "p", "level": "Normal", "text": "JESSLYN: \"Saya cuma ingin publik dapat berita yang berimbang, bukan cuma satu sisi yang menyudutkan anak saya sebelum sidang diputus. Anggap ini... dukungan untuk liputan yang independen.\""}, {"type": "heading", "level": "Heading 2", "text": "Titik Keputusan"}, {"type": "p", "level": "Normal", "text": "• Jessica: menerima tawaran secara naif, mulai curiga, atau menjadikannya bahan investigasi tersendiri?"}, {"type": "p", "level": "Normal", "text": "• Apakah tawaran ini memengaruhi sudut pemberitaan Jessica sebelum Sidang 3?"}, {"type": "heading", "level": "Heading 2", "text": "Terhubung ke"}, {"type": "p", "level": "Normal", "text": "Opsional — bisa jadi bahan pertanyaan tambahan atau kejutan kecil di Sidang 3 kalau ingin menambah drama, tidak wajib dipakai."}]};
+const OVERVIEW = {"kondisi_awal": "**Laporan Kasus Pembunuhan Mahasiswa di universitas X**\n\n**Dugaan Terdakwa: [[07 - Steve]]\n\nUsia 21 tahun, Jurusan Manajemen Bisnis, semester 6 Latar belakang: Anak tunggal dari keluarga yang kaya. Dikenal sebagai sosok populer, ketua salah satu organisasi mahasiswa bergengsi di kampus, dan memiliki circle pertemanan yang berpengaruh secara sosial di lingkungan kampus. \n\n**Korban: Mahasiswa B (alm.)**\n\nUsia 20 tahun, Jurusan Teknik Informatika, semester 6 Berasal dari desa terpencil di Jawa Tengah, kuliah dengan beasiswa penuh atas prestasi akademiknya. Dikenal pendiam, jarang bersosialisasi, namun memiliki reputasi akademik yang sangat baik — beberapa kali menjadi juara kompetisi riset tingkat nasional.\n\n**Kronologi Singkat**\n\nDi sebuah universitas di adakan sebuah perlombaan riset dengan sistem kelompok lomba tersebut merupakan lomba yang sangat di segani takhanya di dalam universitas namun di skala nasional. Salah satu dari peserta lomba nya adalah Tim yang beranggotakan [[07 - Steve]] dan teman temannya. Dan tim dari mahasiswa B yang ber anggotakan teman teman nya yang hanya sedikit itu.\n\nSuatu hari saat hasil riset sudah di kumpulkan, mahasiswa B mendapati terdapati kecurangan yang di lakukan oleh tim dari [[07 - Steve]]. Disebabkan laporan dari Mahasiswa B panitia mengadakan investigasi internal yang membuat tim dari [[07 - Steve]] di eliminasi karena kecurangan nya itu.\n\nDi malam sebelum pengumuman hasil perlombaan di temukan mahasiswa B yang sudah tidak bernyawa di parkiran kampus dan setelah di otopsi di temukan bahwa pengebab kematian nya adalah senjata tumpul yang mengenai belakang kepala yang menyebabkan korban pingsan dan di lanjutkan dengan kekerasan fisik yang di berikan kepada korban\n\nPolisi tidak menemukan bukti yang sangat jelas di lokasi kejadian perkara namun disebabkan interaksi antara [[07 - Steve]] terhadap mahasiswa B beberapa waktu kebelakang maka [[07 - Steve]] menjadi salah terduga pelaku  \n  \nSteve dan keluarga berusaha mempengaruhi kepada pihak pihak berikut:\n1. [[21 - Yohana]] meminta agar di perlambat.\n2. [[02 - Phillip]] meemberikan kesempatan phillip untuk memperingan hukuman.\n3. [[12 - Natalee]] menggoyahkan mental kaylee dengan intimidasi.\n4. [[17 - Becky]] dengan intimidasi yang mengingatkan becky tentang bantuan finansial yang sudah di berikan", "harapan_akhir": "kondisi di akhir mulai menunjukkan bahwa steve tidak bersalah karena setiap suap dan ancaman yang di berikan yang sesuai dengan [[Kondisi Awal]]. Namun dengan kedatangan Alien yang menuntut keadilan untuk korban sehingga dengan adanya kesaksian darinya steve dan orang orang yang menerima suap di berikan hukuman", "tabel_ringkasan": "| Versi | Siapa yang \"Menolak\"?          | Kapan retak terjadi?          | Hasil Akhir                             |\n| ----- | ------------------------------ | ----------------------------- | --------------------------------------- |\n| 1.0   | Tidak ada                      | -                             | Steve bebas total, tanpa cela           |\n| 2.0   | Kaylee saja                    | Saat kesaksian                | Steve bebas, tapi ada keraguan publik   |\n| 3.0   | Yohana                         | Tengah sidang                 | Sidang tertunda, skandal baru terbuka   |\n| 4.0   | Phillip (diam-diam)            | Setelah sidang                | Steve bebas hukum, tapi diselidiki etik |\n| 5.0   | Yohana, Kaylee, Becky, Jessica | Berurutan/domino              | Steve dinyatakan **bersalah**           |\n| 6.0   | Becky vs Kaylee (kontradiksi)  | Bersamaan                     | Status abu-abu, investigasi ulang       |\n| 7.0   | Alice (sabotase halus)         | Sejak awal, ketahuan di akhir | Sidang lanjutan/banding                 |\n| 8.0   | Jessica (duluan ke publik)     | Sebelum sidang mulai          | Menang hukum, kalah opini publik        |\n| 9.0   | Satu orang (fleksibel)         | Detik-detik terakhir          | Klimaks terbuka / mistrial              |"};
+</script>
+<script>
+/* ===== Helpers ===== */
+function cleanWikilinks(text){
+  // [[07 - Steve]] -> Steve ; [[Steve]] -> Steve
+  return text.replace(/\[\[([^\]]+)\]\]/g, (m, inner) => {
+    const parts = inner.split(' - ');
+    return parts.length > 1 ? parts[1].trim() : inner.trim();
+  });
+}
+function md(text){
+  if(!text) return '';
+  return marked.parse(cleanWikilinks(text));
+}
+function el(id){ return document.getElementById(id); }
+
+/* ===== Navigation ===== */
+const views = ['ringkasan','karakter','probabilitas','panduan'];
+function showView(name){
+  views.forEach(v => {
+    el('view-'+v).classList.toggle('active', v===name);
+  });
+  document.querySelectorAll('.navtabs button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view===name);
+  });
+  window.scrollTo({top:0, behavior:'instant'});
+}
+document.querySelectorAll('.navtabs button').forEach(b=>{
+  b.addEventListener('click', ()=>showView(b.dataset.view));
+});
+
+/* ===== Ringkasan (overview) ===== */
+function renderRingkasan(){
+  el('kondisiAwalBody').innerHTML = md(OVERVIEW.kondisi_awal);
+  el('harapanBody').innerHTML = md(OVERVIEW.harapan_akhir);
+}
+
+/* ===== Karakter ===== */
+const KELOMPOK_ORDER = [
+  'Kelompok 1 — Penuntut Umum',
+  'Kelompok 2 — Hakim & Kepaniteraan',
+  'Kelompok 3 — Terdakwa & Penasihat Hukum',
+  'Kelompok 4 — Keluarga',
+  'Kelompok 5 — Saksi-saksi',
+  'Kelompok 6 — Ahli',
+  'Kelompok 7 — Kepolisian & Petugas',
+  'Kelompok 8 — Media',
+  'Moderator'
+];
+
+function groupCharacters(list){
+  const groups = {};
+  list.forEach(c=>{
+    const key = c.kelompok || 'Moderator';
+    if(!groups[key]) groups[key] = [];
+    groups[key].push(c);
+  });
+  return groups;
+}
+
+function renderKarakter(filter){
+  const wrap = el('karakterGroups');
+  wrap.innerHTML = '';
+  const q = (filter||'').trim().toLowerCase();
+  const filtered = CHARACTERS.filter(c=>{
+    if(!q) return true;
+    return (c.name+' '+c.peran+' '+c.body).toLowerCase().includes(q);
+  });
+  const groups = groupCharacters(filtered);
+  KELOMPOK_ORDER.forEach(k=>{
+    const items = groups[k];
+    if(!items || !items.length) return;
+    const block = document.createElement('div');
+    block.className = 'group-block';
+    block.innerHTML = `<div class="group-title">${k}</div>
+      <div class="char-grid"></div>`;
+    const grid = block.querySelector('.char-grid');
+    items.forEach(c=>{
+      const card = document.createElement('div');
+      card.className = 'char-card';
+      card.innerHTML = `<div class="cn">No. ${c.num}</div>
+        <h4>${c.name}</h4>
+        <div class="role">${c.peran||''}</div>`;
+      card.addEventListener('click', ()=>openCharModal(c));
+      grid.appendChild(card);
+    });
+    wrap.appendChild(block);
+  });
+  if(!wrap.children.length){
+    wrap.innerHTML = '<p style="color:var(--ink-soft)">Tidak ada karakter yang cocok dengan pencarian.</p>';
+  }
+}
+
+function openCharModal(c){
+  el('modalBadges').innerHTML = `
+    <span class="badge">No. ${c.num}</span>
+    <span class="badge">${c.kelompok||''}</span>
+    <span class="badge secret">RAHASIA — Khusus Panitia</span>`;
+  el('modalTitle').textContent = `${c.num}. ${c.name}`;
+  el('modalRole').textContent = c.peran || '';
+  el('modalBody').innerHTML = md(c.body);
+  el('charModalOverlay').classList.add('open');
+}
+el('charModalClose').addEventListener('click', ()=> el('charModalOverlay').classList.remove('open'));
+el('charModalOverlay').addEventListener('click', (e)=>{ if(e.target===el('charModalOverlay')) el('charModalOverlay').classList.remove('open'); });
+el('karakterSearch').addEventListener('input', (e)=> renderKarakter(e.target.value));
+
+/* ===== Probabilitas Sidang ===== */
+let activeScenario = SCENARIOS[0].ver;
+
+function outcomeFromTitle(title){
+  return title.replace(/^Sidang \d\.\d\s*/,'').trim();
+}
+
+function renderScenarioTabs(){
+  const tabs = el('scenarioTabs');
+  tabs.innerHTML = '';
+  SCENARIOS.forEach(s=>{
+    const b = document.createElement('button');
+    b.textContent = 'Sidang ' + s.ver;
+    b.className = s.ver===activeScenario ? 'active' : '';
+    b.addEventListener('click', ()=>{ activeScenario = s.ver; renderScenarioTabs(); renderScenarioBody(); });
+    tabs.appendChild(b);
+  });
+}
+
+function renderScenarioBody(){
+  const s = SCENARIOS.find(x=>x.ver===activeScenario);
+  el('scenarioOutcome').textContent = outcomeFromTitle(s.title);
+  el('scenarioBody').innerHTML = md(s.body);
+  const gimikBox = el('scenarioGimik');
+  if(s.gimik && s.gimik.trim()){
+    gimikBox.style.display = 'block';
+    gimikBox.innerHTML = '<h3>Kemungkinan Gimik</h3>' + md(s.gimik);
+  } else {
+    gimikBox.style.display = 'block';
+    gimikBox.innerHTML = '<h3>Kemungkinan Gimik</h3><p style="color:var(--ink-soft); font-style:italic;">Belum diisi di vault sumber.</p>';
+  }
+}
+
+function renderTabelRingkasan(){
+  el('tabelRingkasan').innerHTML = md(OVERVIEW.tabel_ringkasan);
+}
+
+/* ===== Panduan Moderator (docx-derived) ===== */
+function renderDocBlocks(blocks, containerId, lockKeyword){
+  const box = el(containerId);
+  box.innerHTML = '';
+  blocks.forEach(b=>{
+    if(b.type==='table'){
+      const table = document.createElement('table');
+      b.rows.forEach((row,ri)=>{
+        const tr = document.createElement('tr');
+        row.forEach(cell=>{
+          const cellEl = document.createElement(ri===0?'th':'td');
+          cellEl.textContent = cell;
+          tr.appendChild(cellEl);
+        });
+        table.appendChild(tr);
+      });
+      box.appendChild(table);
+    } else {
+      const isHeading = b.level && b.level.includes('Heading');
+      const isTitle = b.level === 'Title';
+      const wrapEl = document.createElement(isTitle ? 'h2' : isHeading ? (b.level.includes('1') ? 'h3' : 'h4') : 'p');
+      let text = b.text;
+      if(lockKeyword && text.includes('🔒')){
+        wrapEl.innerHTML = `<span class="lock-note">${text.replace('🔒 ','')}</span>`;
+      } else {
+        wrapEl.textContent = text;
+      }
+      box.appendChild(wrapEl);
+    }
+  });
+}
+
+function renderPanduan(){
+  renderDocBlocks(DOCS.rundown, 'docRundown');
+  renderDocBlocks(DOCS.panduan_clue, 'docClue', true);
+  renderDocBlocks(DOCS.naskah_rahasia, 'docNaskah', true);
+}
+
+/* ===== Init ===== */
+renderRingkasan();
+renderKarakter('');
+renderScenarioTabs();
+renderScenarioBody();
+renderTabelRingkasan();
+renderPanduan();
+showView('ringkasan');
+
+</script>
+
+</body>
+</html>
